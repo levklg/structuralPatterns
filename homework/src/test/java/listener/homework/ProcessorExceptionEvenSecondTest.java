@@ -6,16 +6,21 @@ import org.junit.jupiter.api.Test;
 import processor.homework.ProcessorExceptionEvenSecond;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 public class ProcessorExceptionEvenSecondTest {
+
 
     private ProcessorExceptionEvenSecond processor;
 
     @Test
-    void processThrowsExceptionOnEvenSecond() {
+    void processThrowsExceptionOnEvenSecond() throws InterruptedException {
 
-        LocalDateTime evenSecondDateTime = LocalDateTime.of(2023, 4, 28, 12, 0, 2);
-        processor = new ProcessorExceptionEvenSecond(() -> evenSecondDateTime);
+        processor = new ProcessorExceptionEvenSecond(LocalDateTime::now);
+
+        if (LocalDateTime.now().getSecond() % 2 != 0) {
+            Thread.sleep(1000);
+        }
 
         assertThatThrownBy(() -> processor.process(new Message.Builder(1).build()))
                 .isInstanceOf(RuntimeException.class)
@@ -23,12 +28,12 @@ public class ProcessorExceptionEvenSecondTest {
     }
 
     @Test
-    void processDoesNotThrowExceptionOnOddSecond() {
+    void processDoesNotThrowExceptionOnOddSecond() throws InterruptedException {
 
-        LocalDateTime oddSecondDateTime = LocalDateTime.of(2023, 4, 28, 12, 0, 3);
-        processor = new ProcessorExceptionEvenSecond(() -> oddSecondDateTime);
-
-        assertThatThrownBy(() -> processor.process(new Message.Builder(1).build())).doesNotThrowAnyException();
+        processor = new ProcessorExceptionEvenSecond(LocalDateTime::now);
+        if (LocalDateTime.now().getSecond() % 2 == 0) {
+            Thread.sleep(1000);
+        }
+        assertThatCode(() -> processor.process(new Message.Builder(1).build())).doesNotThrowAnyException();
     }
-
 }

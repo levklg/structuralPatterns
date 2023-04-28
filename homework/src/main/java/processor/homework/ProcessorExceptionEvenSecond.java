@@ -19,7 +19,7 @@ public class ProcessorExceptionEvenSecond implements Processor {
 
     @Override
     public Message process(Message message) {
-        if (LocalDateTime.now().getSecond() % 2 == 0) {
+        if (currentTimeSupplier.get().getSecond() % 2 == 0) {
             throw new RuntimeException("Exception on even second");
         }
         return message;
